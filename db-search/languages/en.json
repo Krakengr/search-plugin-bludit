@@ -1,0 +1,10 @@
+{
+	"plugin-data":
+	{
+		"name": "DB Search",
+		"description": "Provide a search box to your users to search through the content of your site."
+	},
+	"search": "Search",
+	"show-button-search": "Show button search",
+	"sqlite-not-supported": "Your server does not support sqlite."
+}
