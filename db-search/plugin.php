@@ -18,7 +18,7 @@ class pluginDbSearch extends Plugin
 	 * @var pagesFound
 	 * @access private
 	 */	
-	private $pagesFound = array();
+	private $pagesFound = [];
 	
 	/**
 	 * @var numberOfItems
@@ -35,12 +35,12 @@ class pluginDbSearch extends Plugin
 	public function init()
 	{
 		// Fields and default values for the database of this plugin
-		$this->dbFields = array(
-			'label'=>'Search',
-			'minChars'=>3,
-			'dbuuid'=>null,
-			'showButtonSearch'=>false
-		);
+		$this->dbFields = [
+			'label' => 'Search',
+			'minChars' => 3,
+			'dbuuid' => null,
+			'showButtonSearch' => false
+		];
 	}
 
 	public function form()
@@ -73,13 +73,13 @@ class pluginDbSearch extends Plugin
 			$html .= '<input name="minChars" type="text" value="'.$this->getValue('minChars').'">';
 			$html .= '</div>';
 
-					$html .= '<div>';
-					$html .= '<label>'.$L->get('Show button search').'</label>';
-					$html .= '<select name="showButtonSearch">';
-					$html .= '<option value="true" '.($this->getValue('showButtonSearch')===true?'selected':'').'>'.$L->get('enabled').'</option>';
-					$html .= '<option value="false" '.($this->getValue('showButtonSearch')===false?'selected':'').'>'.$L->get('disabled').'</option>';
+			$html .= '<div>';
+			$html .= '<label>'.$L->get('Show button search').'</label>';
+			$html .= '<select name="showButtonSearch">';
+			$html .= '<option value="true" '.($this->getValue('showButtonSearch')===true?'selected':'').'>'.$L->get('enabled').'</option>';
+			$html .= '<option value="false" '.($this->getValue('showButtonSearch')===false?'selected':'').'>'.$L->get('disabled').'</option>';
 			$html .= '</select>';
-					$html .= '</div>';
+			$html .= '</div>';
 			$html .= '<div>';
 		}
 
@@ -96,7 +96,7 @@ class pluginDbSearch extends Plugin
 		$html .= '<div class="plugin-content">';
 		$html .= '<input type="text" id="jspluginSearchText" /> ';
 		if ($this->getValue('showButtonSearch')) {
-			$html .= '<input type="button" value="'.$L->get('Search').'" onClick="pluginSearch()" />';
+		$html .= '<input type="button" value="'.$L->get('Search').'" onClick="pluginSearch()" />';
 		}
 		$html .= '</div>';
 		$html .= '</div>';
@@ -126,7 +126,7 @@ EOF;
 	
 	public function loadDb()
 	{
-		if ( is_null( $this->qdb ) && class_exists( 'SQLite3' ) && !empty( $this->getValue('dbuuid') ) )
+		if ( $this->qdb === null && class_exists( 'SQLite3' ) && !empty( $this->getValue('dbuuid') ) )
 		{
 			$this->dbFile = $this->workspace() . 'db_' . $this->getValue('dbuuid') . '.sqlite';
 
@@ -188,7 +188,7 @@ EOF;
 	{
 		$this->loadDb();
 		
-		if ( is_null( $this->qdb ) )
+		if ( $this->qdb === null )
 		{
 			return;
 		}
@@ -202,7 +202,7 @@ EOF;
 			// Change the whereAmI to avoid load pages in the rule 69.pages
 			// This is only for performance purpose
 			$url->setWhereAmI( $this->hook );
-
+			
 			// Get the string to search from the URL
 			$stringToSearch = $this->webhook( $this->hook, true, false );
 			$stringToSearch = trim( $stringToSearch, '/' );
@@ -229,7 +229,6 @@ EOF;
 			else
 			{
 				$from = ( ( $pageNumber * $itemsPerPage ) - $itemsPerPage );
-				
 				$this->pagesFound = array_slice( $list, $from, $itemsPerPage, true );
 			}
 		}
@@ -264,7 +263,7 @@ EOF;
 			// We change the content to show in the website
 			global $content;
 			
-			$content = array();
+			$content = [];
 			
 			if ( empty( $this->pagesFound ) )
 			{
@@ -286,15 +285,15 @@ EOF;
 	}
 	
 	// Search inside the database
-	// Returns an array with the results related to the ;text
+	// Returns an array with the results related to the text
 	private function search( $text )
 	{
 		$statement = $this->qdb->prepare('SELECT sef FROM "pages" WHERE "title" LIKE ? OR "content" LIKE ?');
-		$statement->bindValue( 1, '%' . $text . '%' );
-		$statement->bindValue( 2, '%' . $text . '%' );
+		$statement->bindValue( 1, "%$text%" );
+		$statement->bindValue( 2, "%$text%" );
 		$result = $statement->execute();
 
-		$data = array();
+		$data = [];
 		
 		while( $r = $result->fetchArray( SQLITE3_ASSOC ) )
 		{
@@ -321,7 +320,7 @@ EOF;
 		
 		$this->loadDb();
 		
-		if ( is_null( $this->qdb ) )
+		if ($this->qdb === null )
 		{
 			return;
 		}
@@ -331,7 +330,7 @@ EOF;
 		$this->qdb->exec('DELETE FROM pages;');
 		$this->qdb->exec('UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = "pages";');
 
-		// Get all pages published
+		// Get all the published pages
 		$list = $pages->getList( 1, -1, true, true, true, false, false );
 		
 		if ( empty( $list ) )
